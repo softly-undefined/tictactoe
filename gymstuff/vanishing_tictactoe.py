@@ -18,17 +18,6 @@ class VanishingTicTacToeEnv(gym.Env):
                                 shape=(self.num_cells,),
                                 dtype=np.int8),
             "history_x": spaces.Box(low=-1, high=self.num_cells-1,
-                                    shape=(self.n,),
-                                    dtype=np.int8),
-            "history_o": spaces.Box(low=-1, high=self.num_cells-1,
-                                    shape=(self.n,),
-                                    dtype=np.int8),
-        })
-        self.observation_space = spaces.Dict({
-            "board": spaces.Box(low=-1, high=1,
-                                shape=(self.num_cells,),
-                                dtype=np.int8),
-            "history_x": spaces.Box(low=-1, high=self.num_cells-1,
                                     shape=(self.disappear_turn,),
                                     dtype=np.int8),
             "history_o": spaces.Box(low=-1, high=self.num_cells-1,

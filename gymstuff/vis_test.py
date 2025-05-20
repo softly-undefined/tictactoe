@@ -16,7 +16,7 @@ if __name__ == "__main__":
     # these agents can be changed to different agents in the future!
     # agent_x = RandomAgent(env.action_space)  # player X (1) 
     # agent_o = RandomAgent(env.action_space)  # player O (-1) 
-    agent_x = ComplexRuleBasedAgent(env.action_space)  # player X (1) 
+    agent_x = RandomAgent(env.action_space)  # player X (1) 
     agent_o = SimpleRuleBasedAgent(env.action_space)  # player O (-1)
 
     obs = env.reset()

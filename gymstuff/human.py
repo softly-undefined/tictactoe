@@ -1,6 +1,5 @@
 import numpy as np
 from vanishing_tictactoe import VanishingTicTacToeEnv
-from complexrulebased_agent import ComplexRuleBasedAgent
 from moderaterulebased_agent import ModerateRuleBasedAgent
 from simplerulebased_agent import SimpleRuleBasedAgent
 from random_agent import RandomAgent
