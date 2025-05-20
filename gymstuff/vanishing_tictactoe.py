@@ -11,9 +11,34 @@ class VanishingTicTacToeEnv(gym.Env):
         super().__init__()
         self.n = board_size
         self.num_cells = self.n * self.n
-        self.observation_space = spaces.Box(low=-1, high=1, shape=(self.num_cells,), dtype=np.int8)
+        self.observation_space = spaces.Dict({
+            "board": spaces.Box(low=-1, high=1,
+                                shape=(self.num_cells,),
+                                dtype=np.int8),
+            "history_x": spaces.Box(low=-1, high=self.num_cells-1,
+                                    shape=(self.n,),
+                                    dtype=np.int8),
+            "history_o": spaces.Box(low=-1, high=self.num_cells-1,
+                                    shape=(self.n,),
+                                    dtype=np.int8),
+        })
         self.action_space = spaces.Discrete(self.num_cells)
         self.reset()
+
+    #turns board + histories into a dict.
+    def _pack_obs(self):
+        history_x = list(self.move_history_x)
+        history_o = list(self.move_history_o)
+
+        history_x += [-1] * (self.n - len(history_x))
+        history_o += [-1] * (self.n - len(history_o))
+
+        return {
+            "board":     self.board.copy(),
+            "history_x": np.array(history_x, dtype=np.int8),
+            "history_o": np.array(history_o, dtype=np.int8),
+        }
+
 
     def reset(self):
         self.board = np.zeros(self.num_cells, dtype=np.int8)
@@ -21,16 +46,14 @@ class VanishingTicTacToeEnv(gym.Env):
         self.move_history_o = deque()
         self.current_player = 1
         self.done = False
-        return self.board.copy()
+        return self._pack_obs()
 
     def step(self, action):
         info = {} #to store move order
 
         if self.done or self.board[action] != 0:
             info["invalid"]   = True
-            info["history_x"] = list(self.move_history_x)
-            info["history_o"] = list(self.move_history_o)
-            return self.board.copy(), -10.0, True, {"invalid": True}
+            return self._pack_obs(), -10.0, True, info
 
         history = (self.move_history_x if self.current_player == 1 else self.move_history_o)
 
@@ -54,8 +77,7 @@ class VanishingTicTacToeEnv(gym.Env):
         info["history_x"] = list(self.move_history_x)
         info["history_o"] = list(self.move_history_o)
 
-
-        return self.board.copy(), reward, self.done, info
+        return self._pack_obs(), reward, self.done, info
 
     def check_winner(self):
         b = self.board.reshape((self.n, self.n))

@@ -7,26 +7,27 @@ class ModerateRuleBasedAgent:
         self.action_space = action_space
 
     def act(self, observation):
-        board_len = len(observation)
+        board = observation["board"]
+        board_len = len(board)
         board_size = int(math.sqrt(board_len))
-        legal_actions = [i for i in range(board_len) if observation[i] == 0]
+        legal_actions = [i for i in range(board_len) if board[i] == 0]
 
         # determine which player we are
-        count_x = np.sum(observation == 1)
-        count_o = np.sum(observation == -1)
+        count_x = np.sum(board == 1)
+        count_o = np.sum(board == -1)
         player = 1 if count_x == count_o else -1
         opponent = -player
 
         # 1. Can we win?
         for move in legal_actions:
-            temp_board = observation.copy()
+            temp_board = board.copy()
             temp_board[move] = player
             if self.check_win(temp_board, board_size, player):
                 return move
 
         # 2. Do we need to block?
         for move in legal_actions:
-            temp_board = observation.copy()
+            temp_board = board.copy()
             temp_board[move] = opponent
             if self.check_win(temp_board, board_size, opponent):
                 return move

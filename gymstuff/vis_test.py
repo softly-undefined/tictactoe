@@ -7,8 +7,8 @@ from moderaterulebased_agent import ModerateRuleBasedAgent
 # Render
 # This is just a visualization tool, you can
 
-DELAY = 0.5 # if this is larger it will render slower (to make it visible by humans, otherwise use 0)
-BOARD_SIZE = 4 # nxn board
+DELAY = 0.3 # if this is larger it will render slower (to make it visible by humans, otherwise use 0)
+BOARD_SIZE = 3 # nxn board
 
 if __name__ == "__main__":
     env = VanishingTicTacToeEnv(board_size=BOARD_SIZE)
