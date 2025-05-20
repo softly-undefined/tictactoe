@@ -7,9 +7,11 @@ import time
 class VanishingTicTacToeEnv(gym.Env):
     metadata = {"render.modes": ["human"]}
 
-    def __init__(self, board_size=3):
+    def __init__(self, board_size=3, disappear_turn=None):
         super().__init__()
         self.n = board_size
+        self.disappear_turn = self.n
+        self.disappear_turn = self.n if disappear_turn is None else disappear_turn
         self.num_cells = self.n * self.n
         self.observation_space = spaces.Dict({
             "board": spaces.Box(low=-1, high=1,
@@ -22,6 +24,17 @@ class VanishingTicTacToeEnv(gym.Env):
                                     shape=(self.n,),
                                     dtype=np.int8),
         })
+        self.observation_space = spaces.Dict({
+            "board": spaces.Box(low=-1, high=1,
+                                shape=(self.num_cells,),
+                                dtype=np.int8),
+            "history_x": spaces.Box(low=-1, high=self.num_cells-1,
+                                    shape=(self.disappear_turn,),
+                                    dtype=np.int8),
+            "history_o": spaces.Box(low=-1, high=self.num_cells-1,
+                                    shape=(self.disappear_turn,),
+                                    dtype=np.int8),
+        })
         self.action_space = spaces.Discrete(self.num_cells)
         self.reset()
 
@@ -30,8 +43,8 @@ class VanishingTicTacToeEnv(gym.Env):
         history_x = list(self.move_history_x)
         history_o = list(self.move_history_o)
 
-        history_x += [-1] * (self.n - len(history_x))
-        history_o += [-1] * (self.n - len(history_o))
+        history_x += [-1] * (self.disappear_turn - len(history_x))
+        history_o += [-1] * (self.disappear_turn - len(history_o))
 
         return {
             "board":     self.board.copy(),
@@ -57,7 +70,7 @@ class VanishingTicTacToeEnv(gym.Env):
 
         history = (self.move_history_x if self.current_player == 1 else self.move_history_o)
 
-        if len(history) >= self.n:
+        if len(history) >= self.disappear_turn:
             oldest_pos = history.popleft()
             self.board[oldest_pos] = 0
 

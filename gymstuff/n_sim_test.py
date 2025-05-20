@@ -32,6 +32,30 @@ def simulate_game(env, agent_x, agent_o, verbose=False):
 
 if __name__ == "__main__":
     num_games = 500
+    board_sizes = [3, 4, 5, 6]
+
+    for board_size in board_sizes:
+        env = VanishingTicTacToeEnv(board_size=board_size)
+        agent_x = ModerateRuleBasedAgent(env.action_space)
+        agent_o = SimpleRuleBasedAgent(env.action_space)
+
+        results = {1: 0, -1: 0}
+        total_steps = 0
+
+        for _ in tqdm(range(num_games), desc=f'Running games in board_size {board_size}'):
+            outcome, steps = simulate_game(env, agent_x, agent_o)
+            total_steps += steps
+            if outcome == 0:
+                raise ValueError("Draw! (impossible)")
+            results[outcome] += 1
+
+        average_steps = total_steps / num_games
+
+        print(f"\nBoard size: {board_size}x{board_size}")
+        print(f"  X wins: {results[1]}  O wins: {results[-1]}")
+        print(f"  Average steps per game: {average_steps:.2f}")
+
+    num_games = 500
     board_size = 3
 
     env = VanishingTicTacToeEnv(board_size=board_size)
