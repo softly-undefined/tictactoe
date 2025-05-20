@@ -32,7 +32,7 @@ def simulate_game(env, agent_x, agent_o, verbose=False):
 
 if __name__ == "__main__":
     num_games = 500
-    board_size = 3
+    board_size = 4
 
     env = VanishingTicTacToeEnv(board_size=board_size)
 

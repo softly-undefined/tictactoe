@@ -24,10 +24,15 @@ class VanishingTicTacToeEnv(gym.Env):
         return self.board.copy()
 
     def step(self, action):
+        info = {} #to store move order
+
         if self.done or self.board[action] != 0:
+            info["invalid"]   = True
+            info["history_x"] = list(self.move_history_x)
+            info["history_o"] = list(self.move_history_o)
             return self.board.copy(), -10.0, True, {"invalid": True}
 
-        history = self.move_history_x if self.current_player == 1 else self.move_history_o
+        history = (self.move_history_x if self.current_player == 1 else self.move_history_o)
 
         if len(history) >= self.n:
             oldest_pos = history.popleft()
@@ -46,7 +51,11 @@ class VanishingTicTacToeEnv(gym.Env):
             reward = 0.0
             self.current_player *= -1
 
-        return self.board.copy(), reward, self.done, {}
+        info["history_x"] = list(self.move_history_x)
+        info["history_o"] = list(self.move_history_o)
+
+
+        return self.board.copy(), reward, self.done, info
 
     def check_winner(self):
         b = self.board.reshape((self.n, self.n))
