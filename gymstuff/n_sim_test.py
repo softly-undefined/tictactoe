@@ -4,6 +4,7 @@ from random_agent import RandomAgent
 from tqdm import tqdm
 from simplerulebased_agent import SimpleRuleBasedAgent
 from moderaterulebased_agent import ModerateRuleBasedAgent
+from complexrulebased_agent import ComplexRuleBasedAgent
 
 def simulate_game(env, agent_x, agent_o, verbose=False):
     obs = env.reset()

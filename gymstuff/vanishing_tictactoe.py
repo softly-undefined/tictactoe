@@ -23,6 +23,7 @@ class VanishingTicTacToeEnv(gym.Env):
             "history_o": spaces.Box(low=-1, high=self.num_cells-1,
                                     shape=(self.disappear_turn,),
                                     dtype=np.int8),
+            "curr_player": spaces.Box(low=-1, high=1, shape=(1,), dtype=np.int8)
         })
         self.action_space = spaces.Discrete(self.num_cells)
         self.reset()
@@ -39,6 +40,7 @@ class VanishingTicTacToeEnv(gym.Env):
             "board":     self.board.copy(),
             "history_x": np.array(history_x, dtype=np.int8),
             "history_o": np.array(history_o, dtype=np.int8),
+            "current_player": np.array([self.current_player], dtype=np.int8)
         }
 
 
@@ -55,7 +57,9 @@ class VanishingTicTacToeEnv(gym.Env):
 
         if self.done or self.board[action] != 0:
             info["invalid"]   = True
-            return self._pack_obs(), -10.0, True, info
+            print(f"Invalid action: {action} by player {self.current_player}")
+            print(f"Current board:\n{self.board.reshape((self.n, self.n))}")
+            exit("Invalid action taken, exiting...")
 
         history = (self.move_history_x if self.current_player == 1 else self.move_history_o)
 
@@ -70,7 +74,7 @@ class VanishingTicTacToeEnv(gym.Env):
         reward, self.done = 0.0, False
 
         if winner is not None:
-            reward = 1.0
+            reward = 1.0 * winner
             self.done = True
         else:
             reward = 0.0
@@ -114,4 +118,4 @@ class VanishingTicTacToeEnv(gym.Env):
         time.sleep(delay)
 
     def close(self):
-        pass
+        pass 
