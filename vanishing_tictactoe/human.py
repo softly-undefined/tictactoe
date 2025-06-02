@@ -5,9 +5,10 @@ from complexrulebased_agent import ComplexRuleBasedAgent
 from ddqn_agent import DDQNAgent
 import torch
 
+# === CONFIG ===
 BOARD_SIZE = 3
 DELAY = 0.5
-
+MODEL_PATH = "models/wr_75.pth"
 
 human_wins = 0
 ai_wins = 0
@@ -16,18 +17,13 @@ play_as_x = True
 fig, ax = plt.subplots()
 clicked_move = None
 
-
-MODEL_PATH = "models/wr_75.pth"
-
-# Agent stuff
-# Get dimensions from a dummy env
+# importing the ddqn agent
+# getting environment details
 dummy_env = VanishingTicTacToeEnv(board_size=BOARD_SIZE)
 state_dim = dummy_env.observation_space["board"].shape[0] + \
             dummy_env.observation_space["history_x"].shape[0] + \
             dummy_env.observation_space["history_o"].shape[0] + 1  # + current_player
 action_dim = dummy_env.action_space.n
-
-# Create and load agent
 ddqn_agent = DDQNAgent(state_dim, action_dim, device="cpu")  # or "cuda"
 ddqn_agent.load(MODEL_PATH)
 
@@ -128,14 +124,15 @@ while True:
     label = f"Your symbol: {'X' if HUMAN_PLAYER == 1 else 'O'} | Human: {human_wins}   AI: {ai_wins}"
     render_board(board, title=label)
     plt.pause(1)
+    print(f"agent: {AI_PLAYER}")
+    print(f"human: {HUMAN_PLAYER}")
 
-    if reward == 1.0:
-        if current == HUMAN_PLAYER:
-            human_wins += 1
-            print("You win!")
-        else:
-            ai_wins += 1
-            print("AI wins!")
+    if (reward == 1.0 and HUMAN_PLAYER == 1) or (reward == -1.0 and HUMAN_PLAYER == -1):
+        human_wins += 1
+        print("You win!")
+    elif (reward == -1.0 and AI_PLAYER == -1) or (reward == 1.0 and AI_PLAYER == 1):
+        ai_wins += 1
+        print("AI wins!")
     else:
         print("Draw!")
 

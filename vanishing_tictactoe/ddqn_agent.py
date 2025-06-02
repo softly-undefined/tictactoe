@@ -138,7 +138,7 @@ class DDQNAgent:
         return s0, a0, R, next_state, done
 
     # ----------------------------------------------------------- public api
-    def act(self, obs: dict, *, greedy: bool = False) -> int:
+    def act(self, obs: dict, *, greedy: bool = True) -> int:
         state = self._flatten_obs(obs)
         board = obs["board"]
         legal_spots = [i for i, v in enumerate(board) if v == 0]

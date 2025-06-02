@@ -12,21 +12,16 @@ import torch
 BOARD_SIZE = 3
 DELAY = 0.02
 NUM_GAMES = 100
-
 DELAY_BETWEEN_GAMES = 0.05
-
 MODEL_PATH = "models/wr_75.pth"
 
-
-# Agent stuff
-# Get dimensions from a dummy env
+# importing the ddqn agent
+# getting environment details
 dummy_env = VanishingTicTacToeEnv(board_size=BOARD_SIZE)
 state_dim = dummy_env.observation_space["board"].shape[0] + \
             dummy_env.observation_space["history_x"].shape[0] + \
             dummy_env.observation_space["history_o"].shape[0] + 1  # + current_player
 action_dim = dummy_env.action_space.n
-
-# Create and load agent
 ddqn_agent = DDQNAgent(state_dim, action_dim, device="cpu")  # or "cuda"
 ddqn_agent.load(MODEL_PATH)
 
@@ -66,16 +61,13 @@ def render_board(env, board, game_title="", agent_x_name="", agent_o_name=""):
             ax.text(j + 0.5, BOARD_SIZE - 1 - i + 0.5, label,
                     ha='center', va='center', fontsize=20)
 
-    # Grid setup
     ax.set_xlim(0, BOARD_SIZE)
-    ax.set_ylim(-1.2, BOARD_SIZE)  # More space below the board
+    ax.set_ylim(-1.2, BOARD_SIZE)
     ax.set_aspect('equal')
     ax.axis('off')
 
-    # Supertitle
     fig.suptitle(game_title, fontsize=16)
 
-    # Agent labels BELOW the board on separate lines
     ax.text(BOARD_SIZE / 2, -0.5, f"X = {agent_x_name}", ha='center', va='center', fontsize=12)
     ax.text(BOARD_SIZE / 2, -0.9, f"O = {agent_o_name}", ha='center', va='center', fontsize=12)
 
@@ -114,7 +106,6 @@ for game_num in range(1, NUM_GAMES + 1):
         agent_x_name=agent_x.__class__.__name__,
         agent_o_name=agent_o.__class__.__name__
     )
-
 
     plt.pause(DELAY_BETWEEN_GAMES)
 

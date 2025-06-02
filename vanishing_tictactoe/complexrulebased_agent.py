@@ -3,14 +3,15 @@ from collections import deque
 
 class ComplexRuleBasedAgent:
 
-    def __init__(self, action_space):
+    def __init__(self, action_space, epsilon=0.0):
         self.action_space   = action_space
-        self.marker         = None     # +1 (X) or -1 (O)
-        self.n              = None     # board dimension
-        self.k              = None     # disappear_turn
+        self.marker         = None
+        self.n              = None
+        self.k              = None
         self.win_lines      = None
         self.corners        = None
         self.center_cells   = None
+        self.epsilon        = epsilon
         np.random.seed()
 
     def act(self, obs):
@@ -20,7 +21,9 @@ class ComplexRuleBasedAgent:
         board     = obs["board"].copy()
         empty_idx = [i for i, v in enumerate(board) if v == 0]
 
-        # decide side (+1 or -1) once
+        if np.random.rand() < self.epsilon:
+            return np.random.choice(empty_idx)
+
         if self.marker is None:
             self.marker = 1 if (board == 1).sum() == (board == -1).sum() else -1
         me, opp = self.marker, -self.marker
@@ -37,26 +40,21 @@ class ComplexRuleBasedAgent:
         safe        = lambda pos:      self._is_safe_move(board, hist_me, hist_opp,
                                                           pos, me, opp)
 
-        # 1. immediate win
         for pos in empty_idx:
             if win_now(pos):
                 return pos
 
-        # 2. block opponent win
         blocks = [pos for pos in empty_idx if opp_win_now(pos)]
         if blocks:
-            # prefer a *safe* block, otherwise first block
             for pos in blocks:
                 if safe(pos):
                     return pos
             return blocks[0]
 
-        # 3. create fork (must be safe)
         for pos in empty_idx:
             if fork_me(pos) and safe(pos):
                 return pos
 
-        # 4. block opponent fork
         forks_to_block = [pos for pos in empty_idx if fork_opp(pos)]
         if forks_to_block:
             for pos in forks_to_block:
@@ -64,7 +62,6 @@ class ComplexRuleBasedAgent:
                     return pos
             return forks_to_block[0]
 
-        # 5. positional fallback (centre → corner → edge) but keep it safe
         fallback = (
             [c for c in self.center_cells if c in empty_idx] +
             [c for c in self.corners      if c in empty_idx] +
@@ -73,7 +70,6 @@ class ComplexRuleBasedAgent:
         for pos in fallback:
             if safe(pos):
                 return pos
-        # (extremely rare: nothing is safe) → random legal move
         return np.random.choice(empty_idx)
 
     @staticmethod
@@ -87,10 +83,10 @@ class ComplexRuleBasedAgent:
 
         n = self.n
         self.win_lines = (
-            [tuple(r * n + c for c in range(n)) for r in range(n)] +        # rows
-            [tuple(r * n + c for r in range(n)) for c in range(n)] +        # cols
-            [tuple(i * n + i for i in range(n)),                            # diag left to right
-             tuple(i * n + (n - 1 - i) for i in range(n))]                  # diag right to left
+            [tuple(r * n + c for c in range(n)) for r in range(n)] +
+            [tuple(r * n + c for r in range(n)) for c in range(n)] +
+            [tuple(i * n + i for i in range(n)),
+             tuple(i * n + (n - 1 - i) for i in range(n))]
         )
         self.corners = (0, n - 1, n * (n - 1), n * n - 1)
         if n % 2:
@@ -98,7 +94,6 @@ class ComplexRuleBasedAgent:
         else:
             tl = (n // 2 - 1) * n + (n // 2 - 1)
             self.center_cells = (tl, tl + 1, tl + n, tl + n + 1)
-
 
     def _simulate(self, board, hist, pos, player):
         b2 = board.copy()

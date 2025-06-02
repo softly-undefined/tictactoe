@@ -8,21 +8,20 @@ from complexrulebased_agent import ComplexRuleBasedAgent
 from ddqn_agent import DDQNAgent
 import torch
 
+# === CONFIG ===
 DELAY = 0.5
 BOARD_SIZE = 3
 VISUALIZE = True
-
 MODEL_PATH = "models/wr_75.pth"
 
-# Agent stuff
-# Get dimensions from a dummy env
+# importing the ddqn agent
+# getting environment details
 dummy_env = VanishingTicTacToeEnv(board_size=BOARD_SIZE)
 state_dim = dummy_env.observation_space["board"].shape[0] + \
             dummy_env.observation_space["history_x"].shape[0] + \
-            dummy_env.observation_space["history_o"].shape[0] + 1  # + current_player
+            dummy_env.observation_space["history_o"].shape[0] + 1
 action_dim = dummy_env.action_space.n
 
-# Create and load agent
 ddqn_agent = DDQNAgent(state_dim, action_dim, device="cpu")  # or "cuda"
 ddqn_agent.load(MODEL_PATH)
 
